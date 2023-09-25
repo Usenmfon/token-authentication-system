@@ -13,7 +13,13 @@ class UserController extends Controller
      */
 
      public function profile() {
-
-        return response()->json(auth()->user());
+        try {
+            $user = auth()->userOrFail(); // Throws UserNotDefinedException if user is not authenticated
+            return response()->json($user);
+        } catch (\Tymon\JWTAuth\Exceptions\UserNotDefinedException $e) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Something went wrong'], 500);
+        }
     }
 }
